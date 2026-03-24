@@ -1,0 +1,363 @@
+# alanube-dom-go
+
+> Go SDK for the Alanube API - Dominican Republic electronic invoicing (DGII). Covers all endpoints for emitting, querying, and managing electronic fiscal documents (e-CF) with the DGII.
+
+## Module
+
+- Package: `github.com/powky/alanube-dom-go`
+- Language: Go
+- Import: `import alanube "github.com/powky/alanube-dom-go"`
+
+## Base URLs
+
+- Sandbox: `https://sandbox.alanube.co/dom/v1`
+- Production: `https://api.alanube.co/dom/v1`
+
+## Authentication
+
+All endpoints require JWT Bearer token in the Authorization header. The SDK handles this automatically:
+
+```go
+client := alanube.NewClient("jwt-token")         // production
+client := alanube.NewSandboxClient("jwt-token")   // sandbox
+```
+
+Options: `WithHTTPClient(*http.Client)`, `WithBaseURL(string)`, `WithTimeout(time.Duration)`
+
+## Client Methods (86 total)
+
+### Company (5 methods)
+
+| Method | HTTP | Path | Request | Response |
+|--------|------|------|---------|----------|
+| `CreateCompany(ctx, *CreateCompanyRequest)` | POST | `/company` | CreateCompanyRequest | *Company |
+| `GetSelfCompany(ctx)` | GET | `/company` | - | *Company |
+| `UpdateSelfCompany(ctx, *UpdateCompanyRequest)` | PATCH | `/company` | UpdateCompanyRequest | *Company |
+| `GetCompany(ctx, id)` | GET | `/company/{id}` | - | *Company |
+| `UpdateCompany(ctx, id, *UpdateCompanyRequest)` | PATCH | `/company/{id}` | UpdateCompanyRequest | *Company |
+
+### Certification (6 methods)
+
+| Method | HTTP | Path | Request | Response |
+|--------|------|------|---------|----------|
+| `CreateSetTest(ctx, *CreateSetTestRequest)` | POST | `/set-tests` | CreateSetTestRequest | *SetTestCreateResponse |
+| `GetSetTest(ctx, id)` | GET | `/check-set-tests/{id}` | - | *SetTestCheckResponse |
+| `GetSetTestByCompany(ctx, id, companyID)` | GET | `/check-set-tests/{id}/idCompany/{idCompany}` | - | *SetTestCheckResponse |
+| `SignDocument(ctx, xmlFile, fileName)` | POST | `/sign-document` | multipart/form-data (xml file) | *SignDocumentResponse |
+| `SignDocumentByCompany(ctx, companyID, xmlFile, fileName)` | POST | `/sign-document/idCompany/{idCompany}` | multipart/form-data (xml file) | *SignDocumentResponse |
+| `GetProviderInfo(ctx)` | GET | `/provider-info` | - | *ProviderInfo |
+
+### Fiscal Credit Invoice - 31 (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateFiscalInvoice(ctx, *CreateFiscalInvoiceRequest)` | POST | `/fiscal-invoices` |
+| `GetFiscalInvoice(ctx, id, *DocumentQueryOptions)` | GET | `/fiscal-invoices/{id}` |
+| `GetFiscalInvoiceByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/fiscal-invoices/{id}/idCompany/{idCompany}` |
+| `NotifyFiscalInvoice(ctx, *NotifyByEmailRequest)` | POST | `/fiscal-invoices/notify-by-email` |
+
+### Consumption Invoice - 32 (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateConsumptionInvoice(ctx, *CreateConsumptionInvoiceRequest)` | POST | `/invoices` |
+| `GetConsumptionInvoice(ctx, id, *DocumentQueryOptions)` | GET | `/invoices/{id}` |
+| `GetConsumptionInvoiceByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/invoices/{id}/idCompany/{idCompany}` |
+| `NotifyConsumptionInvoice(ctx, *NotifyByEmailRequest)` | POST | `/invoices/notify-by-email` |
+
+### Special Regimes - 44 (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateSpecialRegimesInvoice(ctx, *CreateSpecialRegimesInvoiceRequest)` | POST | `/special-regimes` |
+| `GetSpecialRegimesInvoice(ctx, id, *DocumentQueryOptions)` | GET | `/special-regimes/{id}` |
+| `GetSpecialRegimesInvoiceByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/special-regimes/{id}/idCompany/{idCompany}` |
+| `NotifySpecialRegimesInvoice(ctx, *NotifyByEmailRequest)` | POST | `/special-regimes/notify-by-email` |
+
+### Governmental - 45 (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateGovernmentalInvoice(ctx, *CreateGovernmentalInvoiceRequest)` | POST | `/gubernamentals` |
+| `GetGovernmentalInvoice(ctx, id, *DocumentQueryOptions)` | GET | `/gubernamentals/{id}` |
+| `GetGovernmentalInvoiceByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/gubernamentals/{id}/idCompany/{idCompany}` |
+| `NotifyGovernmentalInvoice(ctx, *NotifyByEmailRequest)` | POST | `/gubernamentals/notify-by-email` |
+
+### Export - 46 (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateExportInvoice(ctx, *CreateExportInvoiceRequest)` | POST | `/export-supports` |
+| `GetExportInvoice(ctx, id, *DocumentQueryOptions)` | GET | `/export-supports/{id}` |
+| `GetExportInvoiceByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/export-supports/{id}/idCompany/{idCompany}` |
+| `NotifyExportInvoice(ctx, *NotifyByEmailRequest)` | POST | `/export-supports/notify-by-email` |
+
+### Debit Note - 33 (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateDebitNote(ctx, *CreateDebitNoteRequest)` | POST | `/debit-notes` |
+| `GetDebitNote(ctx, id, *DocumentQueryOptions)` | GET | `/debit-notes/{id}` |
+| `GetDebitNoteByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/debit-notes/{id}/idCompany/{idCompany}` |
+| `NotifyDebitNote(ctx, *NotifyByEmailRequest)` | POST | `/debit-notes/notify-by-email` |
+
+### Credit Note - 34 (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateCreditNote(ctx, *CreateCreditNoteRequest)` | POST | `/credit-notes` |
+| `GetCreditNote(ctx, id, *DocumentQueryOptions)` | GET | `/credit-notes/{id}` |
+| `GetCreditNoteByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/credit-notes/{id}/idCompany/{idCompany}` |
+| `NotifyCreditNote(ctx, *NotifyByEmailRequest)` | POST | `/credit-notes/notify-by-email` |
+
+### Purchase - 41 (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreatePurchase(ctx, *CreatePurchaseRequest)` | POST | `/purchases` |
+| `GetPurchase(ctx, id, *DocumentQueryOptions)` | GET | `/purchases/{id}` |
+| `GetPurchaseByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/purchases/{id}/idCompany/{idCompany}` |
+| `NotifyPurchase(ctx, *NotifyByEmailRequest)` | POST | `/purchases/notify-by-email` |
+
+### Minor Expense - 43 (3 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateMinorExpense(ctx, *CreateMinorExpenseRequest)` | POST | `/minor-expenses` |
+| `GetMinorExpense(ctx, id, *DocumentQueryOptions)` | GET | `/minor-expenses/{id}` |
+| `GetMinorExpenseByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/minor-expenses/{id}/idCompany/{idCompany}` |
+
+### Payment Abroad - 47 (3 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreatePaymentAbroad(ctx, *CreatePaymentAbroadRequest)` | POST | `/payment-abroad-supports` |
+| `GetPaymentAbroad(ctx, id, *DocumentQueryOptions)` | GET | `/payment-abroad-supports/{id}` |
+| `GetPaymentAbroadByCompany(ctx, id, companyID, *DocumentQueryOptions)` | GET | `/payment-abroad-supports/{id}/idCompany/{idCompany}` |
+
+### Cancellations (3 methods)
+
+| Method | HTTP | Path | Response |
+|--------|------|------|----------|
+| `CreateCancellation(ctx, *CreateCancellationRequest)` | POST | `/cancellations` | *CancellationResponse |
+| `GetCancellation(ctx, id)` | GET | `/cancellations/{id}` | *CancellationStatus |
+| `GetCancellationByCompany(ctx, id, companyID)` | GET | `/cancellations/{id}/idCompany/{idCompany}` | *DocumentStatus |
+
+### Document Reception (1 method)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `ReceiveDocumentFromDGII(ctx, *ReceiveDocumentRequest)` | POST | `/reception/dgii/receive-document` |
+
+Sandbox only. Returns error on failure, nil on success (201 empty body).
+
+### Received Documents (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `GetReceivedDocuments(ctx, *ReceivedDocumentsQueryOptions)` | GET | `/received-documents` |
+| `GetReceivedDocumentsByCompany(ctx, companyID, *ReceivedDocumentsQueryOptions)` | GET | `/received-documents/idCompany/{idCompany}` |
+| `GetReceivedDocument(ctx, id)` | GET | `/received-documents/{id}` |
+| `GetReceivedDocumentByCompany(ctx, id, companyID)` | GET | `/received-documents/{id}/idCompany/{idCompany}` |
+
+### Received Commercial Approvals (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `GetReceivedCommercialApprovals(ctx, *CommercialApprovalsQueryOptions)` | GET | `/received-commercial-approvals` |
+| `GetReceivedCommercialApprovalsByCompany(ctx, companyID, *CommercialApprovalsQueryOptions)` | GET | `/received-commercial-approvals/idCompany/{idCompany}` |
+| `GetReceivedCommercialApproval(ctx, id)` | GET | `/received-commercial-approvals/{id}` |
+| `GetReceivedCommercialApprovalByCompany(ctx, id, companyID)` | GET | `/received-commercial-approvals/{id}/idCompany/{idCompany}` |
+
+### Commercial Response (2 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CreateCommercialResponse(ctx, docID, *CommercialResponseRequest)` | POST | `/received-documents/{id}/commercial-response` |
+| `CreateCommercialResponseByCompany(ctx, docID, companyID, *CommercialResponseRequest)` | POST | `/received-documents/{id}/commercial-response/idCompany/{idCompany}` |
+
+### Generated Commercial Approvals (2 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `GetCommercialApproval(ctx, id)` | GET | `/commercial-approvals/{id}` |
+| `GetCommercialApprovalByCompany(ctx, id, companyID)` | GET | `/commercial-approvals/{id}/idCompany/{idCompany}` |
+
+### Acknowledgments (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `GetExternalAcknowledgment(ctx, companyID, id)` | GET | `/reception/acknowledgments/{companyID}/{id}` |
+| `GetExternalAcknowledgments(ctx, companyID, *AcknowledgmentsQueryOptions)` | GET | `/reception/acknowledgments/{companyID}` |
+| `GetInternalReceipt(ctx, companyID, id)` | GET | `/reception/receipts/{companyID}/{id}` |
+| `GetInternalReceipts(ctx, companyID, *AcknowledgmentsQueryOptions)` | GET | `/reception/receipts/{companyID}` |
+
+### Directory (2 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `GetDirectory(ctx, *DirectoryQueryOptions)` | GET | `/check-directory` |
+| `GetDirectoryByCompany(ctx, companyID, *DirectoryQueryOptions)` | GET | `/check-directory/idCompany/{idCompany}` |
+
+### DGII Status (8 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `CheckDGIIStatus(ctx, *DGIIQueryOptions)` | GET | `/check-dgii-status` |
+| `CheckDGIIStatusByCompany(ctx, companyID, *DGIIQueryOptions)` | GET | `/check-dgii-status/idCompany/{idCompany}` |
+| `GetDGIIServiceStatus(ctx)` | GET | `/check-dgii-status` |
+| `GetDGIIServiceStatusByCompany(ctx, companyID)` | GET | `/check-dgii-status/idCompany/{idCompany}` |
+| `GetDGIIEnvironmentStatus(ctx, env)` | GET | `/check-dgii-status?environment={env}` |
+| `GetDGIIEnvironmentStatusByCompany(ctx, companyID, env)` | GET | `/check-dgii-status/idCompany/{idCompany}?environment={env}` |
+| `GetDGIIMaintenance(ctx)` | GET | `/check-dgii-status?maintenance=yes` |
+| `GetDGIIMaintenanceByCompany(ctx, companyID)` | GET | `/check-dgii-status/idCompany/{idCompany}?maintenance=yes` |
+
+### Reports (4 methods)
+
+| Method | HTTP | Path |
+|--------|------|------|
+| `GetUserDocumentTotals(ctx, *ReportQueryOptions)` | GET | `/reports/users/documents/total` |
+| `GetCompanyDocumentTotals(ctx, companyID, *ReportQueryOptions)` | GET | `/reports/companies/{idCompany}/documents/total` |
+| `GetCompanyEmittedDocuments(ctx, companyID)` | GET | `/companies/{id}/emitted-documents` |
+| `GetCompanyAcceptedDocuments(ctx, companyID)` | GET | `/companies/{id}/accepted-documents` |
+
+### Webhooks (1 function)
+
+| Function | Description |
+|----------|-------------|
+| `ParseWebhook(r *http.Request) (*WebhookEvent, error)` | Parses webhook body and auto-detects event type |
+
+WebhookEvent fields (only one is non-nil):
+- `GovernmentStatusChanged *GovernmentStatusChangedEvent` - Company certification status changed
+- `EmissionFinished *EmissionFinishedEvent` - Document emission completed
+- `DocumentReception *DocumentReceptionEvent` - Document received or commercial approval (types: receivedDocument, receivedCommercialApproval, sentCommercialApproval)
+
+## Key Types
+
+### Document Creation Request Structure
+
+All document types (31, 32, 33, 34, 41, 43, 44, 45, 46, 47) share these sections:
+
+```
+CreateXxxRequest {
+    Company              *DocumentCompany          // optional, for associated companies
+    IdDoc                *IdDoc                    // required: encf, sequenceDueDate, incomeType, paymentType, etc.
+    Sender               *Sender                   // required: rnc, companyName, address, stampDate, etc.
+    Buyer                *Buyer                    // buyer/receiver info (rnc, companyName, foreignIdentifier, etc.)
+    AdditionalInfo       *AdditionalInformationDoc // shipping, transport, export fields
+    Totals               *Totals                   // required: totalAmount, ITBIS rates, otherCurrency, retentions
+    ItemDetails          []ItemDetail              // required: line items with billing, pricing, taxes
+    Subtotals            []Subtotal                // optional subtotal groups
+    DiscountsOrSurcharges []DiscountOrSurcharge    // optional global discounts/surcharges
+    Pagination           []Pagination              // optional page layout
+    InformationReference *InformationReference     // required for notes (33, 34): ncfModified, modificationCode
+    Config               *DocumentConfig           // optional: PDF type and note
+}
+```
+
+### IdDoc Notable Fields
+
+- `ENCF` (string, required): 13-char sequence (E31..., E32..., etc.)
+- `IncomeType` (int): 1-6
+- `PaymentType` (int): 1=Contado, 2=Crédito, 3=Gratuito
+- `CreditNoteIndicator` (*int): only for type 34
+- `PaymentFormsTable` ([]PaymentForm): up to 7, with paymentMethod (1-8) and paymentAmount
+
+### ItemDetail Notable Fields
+
+- `BillingIndicator` (int): 0=No facturable, 1=ITBIS 18%, 2=ITBIS 16%, 3=ITBIS 0%, 4=Exento
+- `GoodServiceIndicator` (int): 1=Bien, 2=Servicio
+- `Retention` (*Retention): for withholding (ITBIS/ISR)
+- `Mining` (*Mining): for mining sector
+- `OtherCurrencyDetail` (*OtherCurrencyDetail): prices in alternative currency
+
+### Document Response
+
+```
+DocumentResponse {
+    ID, StampDate, Status, LegalStatus, CompanyIdentification,
+    ENCF, DocumentNumber, XML, ResumeXML, PDF, DocumentStampURL,
+    SignatureDate, SecurityCode, SequenceConsumed,
+    GovernmentResponse, Response []ResponseMessage
+}
+```
+
+### Error Response Formats
+
+The API returns 3 different error formats:
+- 400: `{"message": ["..."], "code": 400}` (message as array)
+- 404: `{"message": "...", "code": 404}` (message as string)
+- 500: `{"message": "...", "code": "EPR500"}` (code as string)
+
+The SDK's `Error` type handles all formats with custom `UnmarshalJSON`.
+
+## Catalogs (Constants)
+
+### Document Types (DocumentType)
+fiscalInvoice(31), invoice(32), debitNote(33), creditNote(34), purchase(41), minorExpense(43), specialRegime(44), gubernamental(45), exportSupport(46), paymentAbroadSupport(47)
+
+### Statuses (Status)
+REGISTERED, TO_SEND, FAILED, WAITING_RESPONSE, TO_NOTIFY, FINISHED
+
+### Legal Statuses (LegalStatus)
+REJECTED, ACCEPTED, ACCEPTED_WITH_OBSERVATIONS, IN_PROCESS
+
+### Tax Types (TaxType) - 39 codes
+1-5: General taxes (Propina Legal, CDT, ISC Seguros, ISC Telecom, Primera Placa)
+6-22: ISC Específico (alcohol and tobacco)
+23-39: ISC Ad Valorem (alcohol and tobacco)
+
+### Unit Measures (UnitMeasure) - 62 codes
+1-62: BARR, BOL, BOT, BULTO, BOTELLA, CAJ, CM, KG, LB, LITRO, M, M2, M3, UND, EA, etc.
+
+### Currencies (CurrencyCode) - 16 codes
+BRL, CAD, CHF, CHY, XDR, DKK, EUR, GBP, JPY, NOK, SCP, SEK, USD, VEF, HTG, MXN
+
+### DGII Environments (DGIIEnvironment)
+"1"=PreCertificacion, "2"=Producción, "3"=Certificación
+
+### Provinces (Province) - 32 codes
+010000 through 320000
+
+### Municipalities (Municipality) - 155 codes
+
+### Error Codes (ErrorCode) - ~170 codes
+Organized by category: Company (AP1xxx), Users (AP0xxx), DGII (AEP2xxx), Documents (AP3xxx), Set Test (AP4xxx), Acknowledgments (AP7xxx), General (AP9xxx, EPR500), Validations (AP10xxx), Config (AP11xxx), Discounts (AP12xxx), IdDoc (AP13xxx), References (AP14xxx), Currency (AP15xxx), Company Sync (AP16xxx)
+
+## File Structure
+
+```
+alanube-go/
+├── client.go              # HTTP client with auth, JSON, multipart support
+├── config.go              # Base URL constants
+├── errors.go              # Error type with multi-format UnmarshalJSON
+├── error_codes.go         # ~170 error code constants + IsErrorCode()
+├── helpers.go             # Query param helper
+├── company.go             # Company endpoints
+├── company_types.go       # Company, Certificate, Webhooks, Notification types
+├── certification.go       # Certification endpoints
+├── certification_types.go # SetTest, SignDocument, ProviderInfo types
+├── invoice.go             # Invoice endpoints (31, 32, 44, 45, 46)
+├── invoice_types.go       # All document types (IdDoc, Sender, Buyer, Totals, ItemDetail, etc.)
+├── notes.go               # Debit/Credit note endpoints (33, 34)
+├── notes_types.go         # Note request types
+├── purchase.go            # Purchase/Expense endpoints (41, 43, 47)
+├── purchase_types.go      # Purchase request types
+├── cancellation.go        # Cancellation endpoints
+├── cancellation_types.go  # Cancellation types
+├── reception.go           # Document reception, received docs, commercial approvals
+├── reception_types.go     # Reception types with pagination
+├── acknowledgment.go      # Acknowledgment endpoints
+├── acknowledgment_types.go # Acknowledgment types
+├── directory.go           # Directory endpoints
+├── directory_types.go     # Directory types
+├── dgii.go                # DGII status endpoints
+├── dgii_types.go          # DGII status types
+├── reports.go             # Report endpoints
+├── reports_types.go       # Report types
+├── webhook.go             # ParseWebhook function
+├── webhook_types.go       # Webhook event types
+├── catalogs.go            # Document types, statuses, taxes, units, currencies
+├── catalogs_provinces.go  # Province and municipality constants
+└── examples/              # 6 usage examples
+```
