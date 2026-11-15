@@ -505,8 +505,8 @@ type NotifyByEmailResponse struct {
 
 // GovernmentResponseDetail represents a government validation error or warning.
 type GovernmentResponseDetail struct {
-	Value string `json:"valor"`
-	Code  string `json:"codigo"`
+	Value string     `json:"valor"`
+	Code  FlexString `json:"codigo"`
 }
 
 // GovernmentResponse represents the government validation response.

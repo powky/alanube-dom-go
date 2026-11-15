@@ -102,12 +102,23 @@ func (c *Client) do(ctx context.Context, method, path string, query url.Values, 
 		return parseError(resp)
 	}
 
-	if result != nil {
-		if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-			return fmt.Errorf("alanube: decode response: %w", err)
-		}
-	}
+	return decodeResponse(resp, result)
+}
 
+// decodeResponse decodes a successful response into result. On failure it
+// returns a *DecodeError carrying the raw body: the request already succeeded
+// on the server, so callers must still be able to recover e.g. the document ID.
+func decodeResponse(resp *http.Response, result interface{}) error {
+	if result == nil {
+		return nil
+	}
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("alanube: read response: %w", err)
+	}
+	if err := json.Unmarshal(body, result); err != nil {
+		return &DecodeError{StatusCode: resp.StatusCode, Body: body, Err: err}
+	}
 	return nil
 }
 
@@ -134,13 +145,7 @@ func (c *Client) doNoAuth(ctx context.Context, method, fullURL string, query url
 		return parseError(resp)
 	}
 
-	if result != nil {
-		if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-			return fmt.Errorf("alanube: decode response: %w", err)
-		}
-	}
-
-	return nil
+	return decodeResponse(resp, result)
 }
 
 // doMultipartFile performs a multipart/form-data POST with a single file field.
@@ -177,13 +182,7 @@ func (c *Client) doMultipartFile(ctx context.Context, path, fieldName, fileName 
 		return parseError(resp)
 	}
 
-	if result != nil {
-		if err := json.NewDecoder(resp.Body).Decode(result); err != nil {
-			return fmt.Errorf("alanube: decode response: %w", err)
-		}
-	}
-
-	return nil
+	return decodeResponse(resp, result)
 }
 
 func parseError(resp *http.Response) error {

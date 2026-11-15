@@ -23,6 +23,22 @@ func (e *Error) Error() string {
 	return fmt.Sprintf("alanube: %d %s", e.StatusCode, e.Code)
 }
 
+// DecodeError is returned when the API answered with a success status but the
+// body could not be decoded into the expected type. The operation DID succeed
+// on the server side (e.g. the document was created), so Body is kept for
+// recovery — never retry blindly on this error.
+type DecodeError struct {
+	StatusCode int
+	Body       []byte
+	Err        error
+}
+
+func (e *DecodeError) Error() string {
+	return fmt.Sprintf("alanube: decode %d response: %v", e.StatusCode, e.Err)
+}
+
+func (e *DecodeError) Unwrap() error { return e.Err }
+
 // UnmarshalJSON handles the different error response formats from the API.
 func (e *Error) UnmarshalJSON(data []byte) error {
 	// Try format: {"message": [...], "code": ...} or {"message": "...", "code": ...}

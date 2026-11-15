@@ -9,9 +9,15 @@ This is `alanube-go`, a Go SDK for the Alanube API (Dominican Republic DGII elec
 ```bash
 go build ./...    # Build all packages including examples
 go vet ./...      # Run static analysis
+go test ./...     # Unit tests (httptest-based, no network)
 ```
 
-No test files exist yet. No external dependencies (stdlib only).
+No external dependencies (stdlib only).
+
+## API quirks
+
+- The docs declare `governmentResponse.value[].codigo` as a string but the API returns a number. Use `FlexString` for any DGII code field.
+- A 2xx response that fails to decode returns `*DecodeError` with the raw body: the operation already succeeded server-side, so never retry blindly.
 
 ## Architecture
 

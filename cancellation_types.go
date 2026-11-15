@@ -38,8 +38,8 @@ type CancellationResponse struct {
 
 // CancellationGovernmentResponse represents the government response for a cancellation (flat structure).
 type CancellationGovernmentResponse struct {
-	Codigo string `json:"codigo"`
-	Valor  string `json:"valor"`
+	Codigo FlexString `json:"codigo"`
+	Valor  string     `json:"valor"`
 }
 
 // CancellationStatus represents the status of a cancellation (GET /cancellations/{id}).

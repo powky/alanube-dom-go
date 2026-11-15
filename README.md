@@ -289,8 +289,18 @@ if err != nil {
     if apiErr, ok := err.(*alanube.Error); ok {
         fmt.Printf("Code: %s, Messages: %v\n", apiErr.Code, apiErr.Messages)
     }
+
+    // The request succeeded but the response had an unexpected shape:
+    // the document WAS created — recover it from the raw body, don't retry.
+    var decErr *alanube.DecodeError
+    if errors.As(err, &decErr) {
+        log.Printf("unexpected response: %s", decErr.Body)
+    }
 }
 ```
+
+DGII response codes (`governmentResponse.value[].codigo`) are typed as `FlexString`
+because the API returns them as numbers even though the docs say string.
 
 ## Catalogs (Constants)
 
